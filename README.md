@@ -1,5 +1,5 @@
 ## React Native + RealmDB 
-  Colocando em práticas os conceitos sobre RealmDB. 
+  Colocando em prática os conceitos sobre RealmDB. 
   
   Essa aplicação busca o repositório desejado e salva em seu dispositivo algumas informações sobre ele.
 
