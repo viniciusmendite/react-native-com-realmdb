@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {StatusBar, Keyboard} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -12,6 +12,18 @@ import {Container, Title, Form, Input, Submit, List} from './styles';
 const Main = () => {
   const [input, setInput] = useState('');
   const [error, setError] = useState(false);
+  const [repositories, setRepositories] = useState([]);
+
+  useEffect(() => {
+    const loadRepositories = async () => {
+      const realm = await getRealm();
+
+      const data = realm.objects('Repository').sorted('stars', true);
+      setRepositories(data);
+    };
+
+    loadRepositories();
+  }, []);
 
   const saveRepository = async (repository) => {
     const data = {
@@ -29,8 +41,10 @@ const Main = () => {
     // de algum registro do Realm, é necessário encapsular dentro do write()
     realm.write(() => {
       // salvar dados no bd, primeiro passa o nome do schema e depois os dados
-      realm.create('Repository', data);
+      realm.create('Repository', data, 'modified');
     });
+
+    return data;
   };
 
   const handleAddRepository = async () => {
@@ -45,6 +59,16 @@ const Main = () => {
     } catch (error) {
       setError(true);
     }
+  };
+
+  const handleRefreshRepository = async (repository) => {
+    const response = await api.get(`/repos/${repository.fullName}`);
+
+    const data = await saveRepository(response.data);
+
+    setRepositories(
+      repositories.map((repo) => (repo.id === data.id ? data : repo)),
+    );
   };
 
   return (
@@ -70,17 +94,14 @@ const Main = () => {
 
         <List
           keyboardShouldPersistTaps="handled"
-          data={[
-            {
-              id: 1,
-              name: 'RealmDB',
-              description: 'Offline First',
-              stars: 134,
-              forks: 1345774,
-            },
-          ]}
+          data={repositories}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({item}) => <Repository data={item} />}
+          renderItem={({item}) => (
+            <Repository
+              data={item}
+              onRefresh={() => handleRefreshRepository(item)}
+            />
+          )}
         />
       </Container>
     </>

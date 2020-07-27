@@ -1,9 +1,18 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import {Container, Name, Description, Stats, Stat, StatCount} from './styles';
+import {
+  Container,
+  Name,
+  Description,
+  Stats,
+  Stat,
+  StatCount,
+  Refresh,
+  RefreshText,
+} from './styles';
 
-const Repository = ({data}) => {
+const Repository = ({data, onRefresh}) => {
   return (
     <Container>
       <Name>{data.name}</Name>
@@ -20,6 +29,11 @@ const Repository = ({data}) => {
           <StatCount>{data.forks}</StatCount>
         </Stat>
       </Stats>
+
+      <Refresh onPress={onRefresh}>
+        <Icon name="refresh" size={16} color="#7159c1" />
+        <RefreshText>ATUALIZAR</RefreshText>
+      </Refresh>
     </Container>
   );
 };
